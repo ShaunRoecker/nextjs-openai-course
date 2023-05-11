@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useUser } from "@auth0/nextjs-auth0/client"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCoins } from "@fortawesome/free-solid-svg-icons";
+import { Logo } from "../Logo";
 
 export const AppLayout = ({ children }) => {
     const {user} = useUser();
@@ -15,10 +16,8 @@ export const AppLayout = ({ children }) => {
             <div className="flex flex-col text-white overflow-hidden">
 
                 <div className=" bg-slate-800">
-                    <div className="">
-                        logo
-                    </div>
-                    <Link href={"/post/new"} className="bg-green-500 tracking-wider w-full text-center text-white font-bold cursor-pointer uppercase px-4 py-2 rounded-md hover:bg-green-600 transition-colors block">
+                    <Logo />
+                    <Link href={"/post/new"} className="btn">
                         New Post
                     </Link>
                     <Link href={"/token-topup"} className="block mt-2 text-center">
