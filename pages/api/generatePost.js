@@ -7,26 +7,14 @@ export default async function handler(req, res) {
     });
     const openai = new OpenAIApi(config);
 
-    const topic = "functional data structures"
-    const keywords = "functor, monad, queue, lazy-evaluation, stream"
-
     const response = await openai.createCompletion({
         model: "text-davinci-003",
         temperature: 0,
         max_tokens: 3600,
-        prompt: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}.
-        The content should be formatted in SEO-friendly HTML.
-        The response must also include appropriate HTML title and meta description content.
-        The return format must be stringified JSON in the following format:
-        {
-            "postContent": post content here
-            "title": title goes here
-            "metaDescription": meta description goes here
-        }`,
+        prompt: "Generate a blog post about owning dogs"
     });
 
-    console.log("response: ", response);
-    // console.log(JSON.parse(response.data.choices[0]?.text))
+    console.log("response: ", response)
 
-    res.status(200).json({ post: JSON.parse(response.data.choices[0]?.text.replaceAll("\n","")) });
+    res.status(200).json({ result: response.data.choices })
   }
