@@ -1,14 +1,15 @@
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { AppLayout } from "../../components/AppLayout";
 import { useState } from "react";
-
+import { useRouter } from "next/router";
 
 const NewPost = (props) => {
-    // console.log("NEW POST PROPS", props)
-    const [postContent, setPostContent] = useState("");
+    
+    const router = useRouter();
     const [topic, setTopic] = useState("");
     const [keywords, setKeywords] = useState("");
     const [title, setTitle] = useState("");
+   
 
 
     const handleSubmit = async (e) => {
@@ -23,10 +24,12 @@ const NewPost = (props) => {
 
         })
         const json = await response.json();
-        const { postContent, title, metaDescription} = json.post
-        console.log("RESULT ", title, postContent, metaDescription );
-        setPostContent(postContent)
-        setTitle(title)
+        console.log("RESULT:", json);
+        if (json?.postId) {
+            router.push(`/post/${json.postId}`);
+        }
+
+
     };
 
     return (
@@ -63,7 +66,7 @@ const NewPost = (props) => {
                 </button>
             </form>
             
-            <div className="max-w-screen-sm p-10" dangerouslySetInnerHTML={{__html: postContent}} />
+            
         </div>
     );
 }
@@ -76,7 +79,7 @@ NewPost.getLayout = function getLayout(page, pageProps){
 export const getServerSideProps = withPageAuthRequired(() => {
 return {
     props: {
-        test: "this is a test",
+
     },
 };
 });

@@ -54,7 +54,7 @@ export const AppLayout = ({ children }) => {
                 </div>                
             </div>
 
-            <div className="bg-slate-100">{children}</div>
+            {children}
         </div>
     )
 }
