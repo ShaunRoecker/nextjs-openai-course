@@ -20,11 +20,11 @@ const handler = async (req, res) => {
     if (req.method === "POST"){
         let event;
         try{
-            const event = verifyStripe({
+            event = await verifyStripe({
                 req,
                 stripe,
                 endpointSecret,
-            })
+            });
         }catch(e){
             console.log("ERROR: ", e)
         }
@@ -54,7 +54,8 @@ const handler = async (req, res) => {
             default:
                 console.log("Unhandled Event: ", event.type)
         }
+        res.status(200).json({ received: true });
 
     }
 };
-export default cors
+export default cors(handler);
