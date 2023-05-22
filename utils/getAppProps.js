@@ -21,7 +21,9 @@ export const getAppProps = async (ctx) => {
         .collection("posts")
         .find({
             userId: user._id
-        }).sort({
+        })
+        .limit(3)
+        .sort({
             created: -1
         }).toArray();  // toArray is built in MongoDB function
     
