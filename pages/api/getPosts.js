@@ -1,5 +1,5 @@
-import { withApiAuthRequired } from "@auth0/nextjs-auth0";
-
+import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
+import clientPromise from "../../lib/mongodb";
 
 
 
@@ -12,17 +12,17 @@ export default withApiAuthRequired(async function handler(req, res){
             auth0Id: sub
         });
 
-        const {lastPostDate} = req.body
+        const {lastPostDate, getNewerPosts} = req.body
 
         const posts = await db.collection("posts").find({
             userId: userProfile._id,
-            created: {$lt: new Date(lastPostDate)}
+            created: { [getNewerPosts ? "$gt" : "$lt"]: new Date(lastPostDate)}
         })
-        .limit(5)
+        .limit(getNewerPosts ? 0 : 5)
         .sort({ created: -1 })
         .toArray();
 
-        res.status(200).json({posts});
+        res.status(200).json({ posts });
         return;
 
     } catch(e) {
