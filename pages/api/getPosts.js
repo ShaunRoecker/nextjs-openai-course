@@ -14,13 +14,15 @@ export default withApiAuthRequired(async function handler(req, res){
 
         const {lastPostDate, getNewerPosts} = req.body
 
-        const posts = await db.collection("posts").find({
-            userId: userProfile._id,
-            created: { [getNewerPosts ? "$gt" : "$lt"]: new Date(lastPostDate)}
-        })
-        .limit(getNewerPosts ? 0 : 5)
-        .sort({ created: -1 })
-        .toArray();
+        const posts = await db
+            .collection("posts")
+            .find({
+                userId: userProfile._id,
+                created: { [getNewerPosts ? "$gt" : "$lt"]: new Date(lastPostDate)}
+            })
+            .limit(getNewerPosts ? 0 : 5)
+            .sort({ created: -1 })
+            .toArray();
 
         res.status(200).json({ posts });
         return;

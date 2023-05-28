@@ -6,37 +6,93 @@ import { getSession } from "@auth0/nextjs-auth0";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHashtag } from "@fortawesome/free-solid-svg-icons";
 import { getAppProps } from "../../utils/getAppProps";
+import { useState, useContext } from "react";
+import { useRouter } from "next/router";
+import PostsContext from "../../context/postsContext";
 
 
 const Post = (props) => {
+  const router = useRouter();
+    
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const { deletePosts } = useContext(PostsContext);
 
-    return (
-        <div className="overflow-auto h-full"> 
-          <div className="max-w-screen-sm mx-auto">
-            <div className="text-sm font-bold mt-6 p-2 bg-stone-200 rounded-sm">
-              SEO title and meta description
-            </div>
-            <div className="p-4 my-2 border border-stone-200 rounded-md">
-              <div className="text-blue-600 text-2xl font-bold">{props.title}</div>
-              <div className="mt-2">{props.metaDescription}</div>
-            </div>
-            <div className="text-sm font-bold mt-6 p-2 bg-stone-200 rounded-sm">
-              Keywords
-            </div>
-            <div className="flex flex-wrap pt-2 gap-1">
-              {props.keywords.split(",").map((keyword, i) => (
-                <div key={i} className="p-2 rounded-full bg-slate-800 text-white">
-                  <FontAwesomeIcon icon={faHashtag} className="px-1"/>
-                  {keyword}
+  const handleDeleteConfirm = async () => {
+    try {
+      const response = await fetch(`/api/deletePost`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ postId: props.id })
+      });
+      const json = await response.json();
+      if (json.success) {
+        deletePosts(props.id);
+        router.replace(`/post/new`)
+      }
+
+    } catch (e) {
+
+    }
+  }
+
+  return (
+      <div className="overflow-auto h-full"> 
+        <div className="max-w-screen-sm mx-auto">
+          <div className="text-sm font-bold mt-6 p-2 bg-stone-200 rounded-sm">
+            SEO title and meta description
+          </div>
+          <div className="p-4 my-2 border border-stone-200 rounded-md">
+            <div className="text-blue-600 text-2xl font-bold">{props.title}</div>
+            <div className="mt-2">{props.metaDescription}</div>
+          </div>
+          <div className="text-sm font-bold mt-6 p-2 bg-stone-200 rounded-sm">
+            Keywords
+          </div>
+          <div className="flex flex-wrap pt-2 gap-1">
+            {props.keywords.split(",").map((keyword, i) => (
+              <div key={i} className="p-2 rounded-full bg-slate-800 text-white">
+                <FontAwesomeIcon icon={faHashtag} className="px-1"/>
+                {keyword}
+              </div>
+            ))}
+          </div>
+          <div className="text-sm font-bold mt-6 p-2 bg-stone-200 rounded-sm">
+            Blog post
+          </div>
+          <div dangerouslySetInnerHTML={{__html: props.postContent || ""}}/>
+          <div className="my-4">
+            {!showDeleteConfirm && (
+              <button 
+                className="btn bg-red-600 hover:bg-red-700" 
+                onClick={() => setShowDeleteConfirm(true)}
+              >Delete post
+              </button>
+            )}
+            {!!showDeleteConfirm && (
+              <div className="p-2 bg-red-300 text-center">
+                <p>
+                  Are you sure you want to delete this post? This action cannot be undone.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    className="btn bg-stone-600 hover:bg-stone-700"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    >cancel
+                  </button>
+                  <button 
+                    className="btn bg-red-600 hover:bg-red-700"
+                    onClick={handleDeleteConfirm}
+                    >confirm delete
+                  </button>
+                  
                 </div>
-              ))}
-            </div>
-            <div className="text-sm font-bold mt-6 p-2 bg-stone-200 rounded-sm">
-              Blog post
-            </div>
-            <div dangerouslySetInnerHTML={{__html: props.postContent || ""}}/>
-          </div>     
-        </div>
+              </div>
+            )}
+          </div>
+        </div>     
+      </div>
     );
   }
   export default Post;
@@ -72,6 +128,7 @@ export const getServerSideProps = withPageAuthRequired({
 
     return {
       props: {
+        id: ctx.params.postId,
         postContent: post.postContent,
         title: post.title,
         metaDescription: post.metaDescription,
